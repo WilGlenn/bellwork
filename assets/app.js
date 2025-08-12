@@ -36,3 +36,25 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+// Drag-and-drop student reordering on attendance page using SortableJS
+document.addEventListener('DOMContentLoaded', function() {
+    const tbody = document.querySelector('#attendance-table tbody');
+    if (tbody && window.Sortable) {
+        new Sortable(tbody, {
+            handle: '.drag-handle',
+            animation: 150,
+            onEnd: function () {
+                console.log('Attendance table reordered');
+                const classId = document.querySelector('input.att-checkbox')?.dataset.classId;
+                if (!classId) return;
+                const order = Array.from(tbody.querySelectorAll('tr[data-student]')).map(tr => tr.getAttribute('data-student'));
+                fetch('api/students/reorder', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ classId, order })
+                });
+            }
+        });
+        console.log('Sortable initialized for attendance table');
+    }
+});

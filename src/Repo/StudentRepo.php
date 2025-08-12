@@ -13,7 +13,7 @@ class StudentRepo {
         return $stmt->fetchColumn();
     }
     public static function allByClass($classId) {
-        $stmt = Db::get()->prepare('SELECT * FROM students WHERE class_id=? ORDER BY name');
+        $stmt = Db::get()->prepare('SELECT * FROM students WHERE class_id=? ORDER BY sort_order, name');
         $stmt->execute([$classId]);
         return $stmt->fetchAll();
     }
