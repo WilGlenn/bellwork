@@ -1,5 +1,36 @@
 // Minimal JS for attendance checkboxes and totals
 document.addEventListener('DOMContentLoaded', function() {
+    // Three-state attendance toggles
+    document.querySelectorAll('.att-toggle').forEach(function(toggle) {
+        toggle.addEventListener('click', function() {
+            const states = ['□', '✔', 'A'];
+            const classes = ['', 'att-present', 'att-absent'];
+            let current = 0;
+            if (this.classList.contains('att-present')) current = 1;
+            else if (this.classList.contains('att-absent')) current = 2;
+            // Next state
+            let next = (current + 1) % 3;
+            this.textContent = states[next];
+            this.classList.remove('att-present', 'att-absent');
+            if (classes[next]) this.classList.add(classes[next]);
+            // Send to backend
+            const classId = this.dataset.classId;
+            const studentId = this.dataset.studentId;
+            const day = this.dataset.day;
+            let value = '';
+            if (next === 1) value = 1;
+            else if (next === 2) value = 'A';
+            fetch('/api/attendance/toggle', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ classId, studentId, day, checked: value })
+            }).then(r => r.json()).then(resp => {
+                if (!resp.success) alert(resp.error || 'Error');
+            });
+            // Update total for the row
+            updateTotal(this.closest('tr'));
+        });
+    });
     document.querySelectorAll('.att-checkbox').forEach(cb => {
         cb.addEventListener('change', function() {
             const { classId, studentId, day } = this.dataset;
@@ -15,7 +46,9 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     function updateTotal(row) {
         let total = 0;
-        row.querySelectorAll('.att-checkbox').forEach(cb => { if (cb.checked) total++; });
+        row.querySelectorAll('.att-toggle').forEach(tg => {
+            if (tg.classList.contains('att-present')) total++;
+        });
         row.querySelector('.att-total').textContent = total;
     }
     document.querySelectorAll('tr[data-student]').forEach(row => updateTotal(row));
