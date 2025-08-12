@@ -44,7 +44,23 @@ ob_start();
         <tr data-student="<?= $s['id'] ?>">
             <td><span class="drag-handle" style="cursor:grab;">&#9776;</span> <?= htmlspecialchars($s['name']) ?></td>
             <?php foreach (["Mon","Tue","Thu","Fri"] as $day): ?>
-                <td><input type="checkbox" class="form-check-input att-checkbox" data-class-id="<?= $selectedClass ?>" data-student-id="<?= $s['id'] ?>" data-day="<?= $day ?>" <?= !empty($attendance[$s['id']][$day]) ? 'checked' : '' ?>></td>
+                <?php
+                    $status = isset($attendance[$s['id']][$day]) ? $attendance[$s['id']][$day] : '';
+                    $attClass = '';
+                    $attText = '□';
+                    if ($status === '1' || $status === 1) {
+                        $attClass = 'att-present';
+                        $attText = '✔';
+                    } elseif ($status === 'A') {
+                        $attClass = 'att-absent';
+                        $attText = 'A';
+                    }
+                ?>
+                <td>
+                    <span class="att-toggle <?= $attClass ?>" tabindex="0" role="button" aria-label="Attendance status" data-class-id="<?= $selectedClass ?>" data-student-id="<?= $s['id'] ?>" data-day="<?= $day ?>">
+                        <?= $attText ?>
+                    </span>
+                </td>
             <?php endforeach; ?>
             <td class="att-total">0</td>
         </tr>
@@ -54,26 +70,6 @@ ob_start();
 <?php elseif ($selectedClass): ?>
     <div class="alert alert-warning">No students in this class.</div>
 <?php endif; ?>
-<h2>SortableJS Test Table</h2>
-<table class="table" id="sortable-test">
-    <tbody>
-        <tr><td><span class="drag-handle">&#9776;</span> Row 1</td></tr>
-        <tr><td><span class="drag-handle" style="cursor:grab;">&#9776;</span> Row 2</td></tr>
-        <tr><td><span class="drag-handle">&#9776;</span> Row 3</td></tr>
-    </tbody>
-</table>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    if (window.Sortable) {
-        new Sortable(document.querySelector('#sortable-test tbody'), {
-            handle: '.drag-handle',
-            animation: 150,
-            onEnd: function() { console.log('Test table reordered'); }
-        });
-        console.log('Test Sortable initialized');
-    }
-});
-</script>
 <?php
 $content = ob_get_clean();
 include __DIR__ . '/layout.php';
