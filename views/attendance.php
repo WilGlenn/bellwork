@@ -28,7 +28,7 @@ ob_start();
     </div>
 </form>
 <?php if ($students): ?>
-<table class="table table-bordered align-middle">
+<table class="table table-bordered align-middle" id="attendance-table">
     <thead>
         <tr>
             <th>Student</th>
@@ -42,7 +42,7 @@ ob_start();
     <tbody>
     <?php foreach ($students as $s): ?>
         <tr data-student="<?= $s['id'] ?>">
-            <td><?= htmlspecialchars($s['name']) ?></td>
+            <td><span class="drag-handle" style="cursor:grab;">&#9776;</span> <?= htmlspecialchars($s['name']) ?></td>
             <?php foreach (["Mon","Tue","Thu","Fri"] as $day): ?>
                 <td><input type="checkbox" class="form-check-input att-checkbox" data-class-id="<?= $selectedClass ?>" data-student-id="<?= $s['id'] ?>" data-day="<?= $day ?>" <?= !empty($attendance[$s['id']][$day]) ? 'checked' : '' ?>></td>
             <?php endforeach; ?>
@@ -54,6 +54,26 @@ ob_start();
 <?php elseif ($selectedClass): ?>
     <div class="alert alert-warning">No students in this class.</div>
 <?php endif; ?>
+<h2>SortableJS Test Table</h2>
+<table class="table" id="sortable-test">
+    <tbody>
+        <tr><td><span class="drag-handle">&#9776;</span> Row 1</td></tr>
+        <tr><td><span class="drag-handle" style="cursor:grab;">&#9776;</span> Row 2</td></tr>
+        <tr><td><span class="drag-handle">&#9776;</span> Row 3</td></tr>
+    </tbody>
+</table>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    if (window.Sortable) {
+        new Sortable(document.querySelector('#sortable-test tbody'), {
+            handle: '.drag-handle',
+            animation: 150,
+            onEnd: function() { console.log('Test table reordered'); }
+        });
+        console.log('Test Sortable initialized');
+    }
+});
+</script>
 <?php
 $content = ob_get_clean();
 include __DIR__ . '/layout.php';
