@@ -65,11 +65,10 @@ class Router {
             (new \App\Controller\SetupController())->index();
             return;
         }
-          if ($uri === '/api/students/reorder') {
+		if ($uri === '/api/students/reorder') {
             (new \App\Controller\StudentOrderController())->reorder();
             return;
         }
-
         // 404
         http_response_code(404);
         echo 'Not Found';

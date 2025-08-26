@@ -1,8 +1,8 @@
 // Minimal JS for attendance checkboxes and totals
 document.addEventListener('DOMContentLoaded', function() {
-    // Three-state attendance toggles
-    document.querySelectorAll('.att-toggle').forEach(function(toggle) {
-        toggle.addEventListener('click', function() {
+	// Three-state attendance toggles
+    document.querySelectorAll('.att-toggle').forEach(function(cell) {
+        cell.addEventListener('click', function() {
             const states = ['□', '✔', 'A'];
             const classes = ['', 'att-present', 'att-absent'];
             let current = 0;
@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const day = this.dataset.day;
             let value = '';
             if (next === 1) value = 1;
-            else if (next === 2) value = 'A';
+            else if (next === 2) value = 2;
             fetch('/api/attendance/toggle', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
             updateTotal(this.closest('tr'));
         });
     });
-    document.querySelectorAll('.att-checkbox').forEach(cb => {
+	    document.querySelectorAll('.att-checkbox').forEach(cb => {
         cb.addEventListener('change', function() {
             const { classId, studentId, day } = this.dataset;
             fetch('/api/attendance/toggle', {
@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     function updateTotal(row) {
         let total = 0;
-        row.querySelectorAll('.att-toggle').forEach(tg => {
+		row.querySelectorAll('.att-toggle').forEach(tg => {
             if (tg.classList.contains('att-present')) total++;
         });
         row.querySelector('.att-total').textContent = total;
@@ -78,8 +78,10 @@ document.addEventListener('DOMContentLoaded', function() {
             animation: 150,
             onEnd: function () {
                 console.log('Attendance table reordered');
-                const classId = document.querySelector('input.att-checkbox')?.dataset.classId;
+                //const classId = document.querySelector('input.att-checkbox')?.dataset.classId;
+				const classId = document.querySelector('span.att-toggle')?.dataset.classId;
                 if (!classId) return;
+				console.log("class id worked")
                 const order = Array.from(tbody.querySelectorAll('tr[data-student]')).map(tr => tr.getAttribute('data-student'));
                 fetch('api/students/reorder', {
                     method: 'POST',

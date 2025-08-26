@@ -14,6 +14,11 @@ class AttendanceController {
         $students = $selectedClass ? \App\Repo\StudentRepo::allByClass($selectedClass) : [];
         $weekStart = \App\Helper\Week::currentWeekStart();
         $attendance = [];
+        $includeWednesday = false;
+        if ($selectedTeacher) {
+            $teacher = \App\Repo\TeacherRepo::get($selectedTeacher);
+            $includeWednesday = !empty($teacher['include_wednesday']);
+        }
         if ($selectedClass) {
             $rows = \App\Repo\AttendanceRepo::getForClassWeek($selectedClass, $weekStart);
             foreach ($rows as $row) {
@@ -30,6 +35,18 @@ class AttendanceController {
         $day = isset($data['day']) ? $data['day'] : '';
         $checked = isset($data['checked']) ? (int)$data['checked'] : 0;
         $validDays = ['Mon','Tue','Thu','Fri'];
+        // Dynamically allow Wednesday if teacher has flag
+        $includeWednesday = false;
+        if ($classId) {
+            // Get teacher for this class
+            $class = \App\Repo\ClassRepo::get($classId);
+            if ($class && !empty($class['teacher_id'])) {
+                $teacher = \App\Repo\TeacherRepo::get($class['teacher_id']);
+                if ($teacher && !empty($teacher['include_wednesday'])) {
+                    $validDays[] = 'Wed';
+                }
+            }
+        }
         if (!$classId || !$studentId || !in_array($day, $validDays, true)) {
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'error' => 'Invalid input']);
