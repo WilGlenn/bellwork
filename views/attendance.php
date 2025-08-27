@@ -34,6 +34,7 @@ ob_start();
             <th>Student</th>
             <th>Mon</th>
             <th>Tue</th>
+            <?php if (!empty($includeWednesday)): ?><th>Wed</th><?php endif; ?>
             <th>Thu</th>
             <th>Fri</th>
             <th>Total</th>
@@ -43,7 +44,12 @@ ob_start();
     <?php foreach ($students as $s): ?>
         <tr data-student="<?= $s['id'] ?>">
             <td><span class="drag-handle" style="cursor:grab;">&#9776;</span> <?= htmlspecialchars($s['name']) ?></td>
-            <?php foreach (["Mon","Tue","Thu","Fri"] as $day): ?>
+            <?php
+                $days = ["Mon","Tue"];
+                if (!empty($includeWednesday)) $days[] = "Wed";
+                $days = array_merge($days, ["Thu","Fri"]);
+            ?>
+            <?php foreach ($days as $day): ?>
                 <?php
                     $status = isset($attendance[$s['id']][$day]) ? $attendance[$s['id']][$day] : '';
                     $attClass = '';
@@ -51,15 +57,13 @@ ob_start();
                     if ($status === '1' || $status === 1) {
                         $attClass = 'att-present';
                         $attText = '✔';
-                    } elseif ($status === 'A') {
+                    } elseif ($status === 2) {
                         $attClass = 'att-absent';
                         $attText = 'A';
                     }
                 ?>
-                <td>
-                    <span class="att-toggle <?= $attClass ?>" tabindex="0" role="button" aria-label="Attendance status" data-class-id="<?= $selectedClass ?>" data-student-id="<?= $s['id'] ?>" data-day="<?= $day ?>">
-                        <?= $attText ?>
-                    </span>
+                <td class="att-toggle <?= $attClass ?>" tabindex="0" role="button" aria-label="Attendance status" data-class-id="<?= $selectedClass ?>" data-student-id="<?= $s['id'] ?>" data-day="<?= $day ?>">
+                    <?= $attText ?>
                 </td>
             <?php endforeach; ?>
             <td class="att-total">0</td>

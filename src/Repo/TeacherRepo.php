@@ -4,10 +4,10 @@ namespace App\Repo;
 use App\Db;
 
 class TeacherRepo {
-    public static function upsert($name) {
+    public static function upsert($name, $includeWednesday = 0) {
         $pdo = Db::get();
-        $stmt = $pdo->prepare('INSERT INTO teachers (name) VALUES (?) ON DUPLICATE KEY UPDATE name=VALUES(name)');
-        $stmt->execute([$name]);
+        $stmt = $pdo->prepare('INSERT INTO teachers (name, include_wednesday) VALUES (?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name), include_wednesday=VALUES(include_wednesday)');
+        $stmt->execute([$name, $includeWednesday]);
         return $pdo->query('SELECT id FROM teachers WHERE name=' . $pdo->quote($name))->fetchColumn();
     }
     public static function all() {
@@ -40,8 +40,8 @@ class TeacherRepo {
         // Delete teacher
         $pdo->prepare('DELETE FROM teachers WHERE id=?')->execute([$id]);
     }
-    public static function update($id, $name) {
-        $stmt = Db::get()->prepare('UPDATE teachers SET name=? WHERE id=?');
-        $stmt->execute([$name, $id]);
+    public static function update($id, $name, $includeWednesday = 0) {
+        $stmt = Db::get()->prepare('UPDATE teachers SET name=?, include_wednesday=? WHERE id=?');
+        $stmt->execute([$name, $includeWednesday, $id]);
     }
 }

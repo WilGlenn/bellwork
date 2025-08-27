@@ -10,12 +10,14 @@ class SetupController {
         $editId = isset($_GET['edit']) ? (int)$_GET['edit'] : 0;
         if ($method === 'POST') {
             if (isset($_POST['name'])) {
-                \App\Repo\TeacherRepo::upsert(trim($_POST['name']));
+                $includeWednesday = isset($_POST['include_wednesday']) ? 1 : 0;
+                \App\Repo\TeacherRepo::upsert(trim($_POST['name']), $includeWednesday);
                 $_SESSION['flash'] = 'Teacher added.';
                 header('Location: /setup/teachers'); exit;
             }
             if (isset($_POST['edit_id'], $_POST['edit_name'])) {
-                \App\Repo\TeacherRepo::update((int)$_POST['edit_id'], trim($_POST['edit_name']));
+                $includeWednesday = isset($_POST['edit_include_wednesday']) ? 1 : 0;
+                \App\Repo\TeacherRepo::update((int)$_POST['edit_id'], trim($_POST['edit_name']), $includeWednesday);
                 $_SESSION['flash'] = 'Teacher updated.';
                 header('Location: /setup/teachers'); exit;
             }

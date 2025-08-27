@@ -8,6 +8,12 @@ ob_start();
         <input type="text" name="name" class="form-control" placeholder="Add teacher name" required>
     </div>
     <div class="col-auto">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="include_wednesday" id="include_wednesday">
+            <label class="form-check-label" for="include_wednesday">Include Wednesdays</label>
+        </div>
+    </div>
+    <div class="col-auto">
         <button type="submit" class="btn btn-primary">Add</button>
     </div>
 </form>
@@ -21,10 +27,15 @@ ob_start();
                     <form method="post" class="d-inline">
                         <input type="hidden" name="edit_id" value="<?= $t['id'] ?>">
                         <input type="text" name="edit_name" value="<?= htmlspecialchars($t['name']) ?>" required>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="edit_include_wednesday" id="edit_include_wednesday_<?= $t['id'] ?>" <?= $t['include_wednesday'] ? 'checked' : '' ?>>
+                            <label class="form-check-label" for="edit_include_wednesday_<?= $t['id'] ?>">Include Wednesdays</label>
+                        </div>
                         <button type="submit" class="btn btn-sm btn-success">Save</button>
                     </form>
                 <?php else: ?>
                     <?= htmlspecialchars($t['name']) ?>
+                    <span class="badge bg-info text-dark ms-2">Wednesdays: <?= $t['include_wednesday'] ? 'Yes' : 'No' ?></span>
                 <?php endif; ?>
             </td>
             <td>
